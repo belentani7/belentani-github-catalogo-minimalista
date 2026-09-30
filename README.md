@@ -1,25 +1,27 @@
-# belentani · catálogo minimalista
+# belentani-github-catalogo-minimalista
 
-Catálogo web minimalista de los repositorios públicos de [belentani7](https://github.com/belentani7): tarjetas de proyecto, datos vivos desde la GitHub API y visual de partículas.
+Catálogo minimalista de repositorios.
+
+## Qué es
+
+Una vista limpia del catálogo de proyectos: qué existe, para qué sirve y dónde está. Sin
+adornos, porque el objetivo es encontrar cosas, no admirar la página.
+
+En línea: <https://belentani7.github.io/belentani-github-catalogo-minimalista/>
 
 ## Stack
 
-- React + Vite + TypeScript
-- GitHub REST API (datos en vivo del perfil público)
-- Estética glass/neón, sin librerías de UI pesadas
+- **Vite** — build (`postcss.config.mjs`, `tsconfig.json`)
+- **TypeScript** — tipado
+- **PostCSS** — estilos
 
-## Uso
+## Puesta en marcha
 
 ```bash
 npm install
-npm run dev    # desarrollo local
-npm run build  # build de producción (dist/)
+npm run dev
 ```
-
-## Alcance
-
-Catálogo de **solo lectura**: lista los repos públicos del perfil y enlaza a ellos. No modifica ni borra nada.
 
 ## Licencia
 
-MIT — ver [LICENSE](LICENSE).
+MIT — ver `LICENSE`.

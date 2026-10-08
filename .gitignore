@@ -1,19 +1,16 @@
+
+# --- guardias-sinc-2026-10-08 (auto) ---
 node_modules/
 .env
 .env.*
 !.env.example
+*.pem
+*.key
+.next/
+.nuxt/
+.turbo/
 dist/
 build/
-.next/
 coverage/
 *.log
 .DS_Store
-Thumbs.db
-__pycache__/
-*.pyc
-.venv/
-venv/
-*.db
-*.sqlite3
-.turbo/
-.vercel

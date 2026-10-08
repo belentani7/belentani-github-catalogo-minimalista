@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import type { Repo } from "../types";
 import { fmtSize, fullDate, langColor, timeAgo } from "../lib";
 
@@ -10,11 +10,32 @@ export default function ProjectModal({
   repo: Repo | null;
   onClose: () => void;
 }) {
+  const panel = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    if (!repo) return;
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    panel.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { e.preventDefault(); onClose(); }
+      if (e.key !== "Tab") return;
+      const elements = panel.current?.querySelectorAll<HTMLElement>('button, a[href], [tabindex="0"]');
+      if (!elements?.length) { e.preventDefault(); return; }
+      const first = elements[0], last = elements[elements.length - 1];
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === panel.current)) {
+        e.preventDefault(); last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault(); first.focus();
+      }
+    };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = previousOverflow;
+      previousFocus?.focus();
+    };
+  }, [repo, onClose]);
 
   return (
     <AnimatePresence>
@@ -29,12 +50,17 @@ export default function ProjectModal({
           <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
 
           <motion.div
+            ref={panel}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="project-title"
+            tabIndex={-1}
             initial={{ opacity: 0, y: 30, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.97 }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             onClick={(e) => e.stopPropagation()}
-            className="glass-strong hud-corner relative z-10 w-full max-w-2xl overflow-hidden rounded-3xl p-8 md:p-10"
+            className="glass-strong hud-corner relative z-10 max-h-[90dvh] w-full max-w-2xl overflow-y-auto rounded-3xl p-6 md:p-10"
           >
             <span className="c1" />
             <span className="c2" />
@@ -44,7 +70,7 @@ export default function ProjectModal({
                 <span className="font-mono text-[10px] tracking-[0.3em] text-indigo-300/60">
                   // MÓDULO DE PROYECTO
                 </span>
-                <h3 className="font-display mt-2 text-3xl font-light tracking-wide text-white">
+                <h3 id="project-title" className="font-display mt-2 break-words text-3xl font-light tracking-wide text-white">
                   {repo.name}
                 </h3>
               </div>

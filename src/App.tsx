@@ -17,7 +17,7 @@ type SortKey = "stars" | "recent" | "name";
 
 export default function App() {
   useSmoothScroll();
-  const { repos, profile, loading, error } = useRepos();
+  const { repos, profile, loading, error, retry } = useRepos();
   const [query, setQuery] = useState("");
   const [activeLang, setActiveLang] = useState("Todos");
   const [sort, setSort] = useState<SortKey>("stars");
@@ -66,7 +66,7 @@ export default function App() {
           LAT 41.38 · LON 2.17
         </div>
         <div className="absolute bottom-6 left-6 font-mono text-[10px] tracking-[0.3em] text-white/25">
-          v2.5.0 — STABLE
+          CATÁLOGO PÚBLICO
         </div>
         <div className="absolute bottom-6 right-6 font-mono text-[10px] tracking-[0.3em] text-white/25">
           @{USERNAME}
@@ -86,7 +86,7 @@ export default function App() {
           >
             <span>— 001</span>
             <span className="hidden sm:inline">CATÁLOGO DE PROYECTOS</span>
-            <span>2025 —</span>
+            <span>{new Date().getFullYear()} —</span>
           </motion.div>
 
           <motion.h1
@@ -151,10 +151,10 @@ export default function App() {
 
       {/* ================= STATS ================= */}
       <section className="relative z-10 mx-auto grid max-w-5xl grid-cols-2 gap-px overflow-hidden border-y border-white/[0.06] bg-white/[0.01] md:grid-cols-4">
-        <Stat label="REPOSITORIOS" value={loading ? "—" : String(repos.length)} />
-        <Stat label="ESTRELLAS" value={loading ? "—" : String(totalStars)} />
-        <Stat label="FORKS" value={loading ? "—" : String(totalForks)} />
-        <Stat label="SEGUIDORES" value={loading ? "—" : String(profile?.followers ?? 0)} />
+        <Stat label="REPOS PÚBLICOS" value={loading || error ? "—" : String(repos.length)} />
+        <Stat label="ESTRELLAS" value={loading || error ? "—" : String(totalStars)} />
+        <Stat label="FORKS" value={loading || error ? "—" : String(totalForks)} />
+        <Stat label="SEGUIDORES" value={loading || error ? "—" : String(profile?.followers ?? 0)} />
       </section>
 
       {/* ================= TECH STACK ================= */}
@@ -218,6 +218,7 @@ export default function App() {
                   <circle cx="11" cy="11" r="7" /><path d="M21 21l-4-4" strokeLinecap="round" />
                 </svg>
                 <input
+                  aria-label="Buscar proyectos"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="buscar módulo..."
@@ -231,6 +232,8 @@ export default function App() {
                     key={k}
                     data-hover
                     onClick={() => setSort(k)}
+                    aria-pressed={sort === k}
+                    aria-label={k === "stars" ? "Ordenar por estrellas" : k === "recent" ? "Ordenar por actividad reciente" : "Ordenar por nombre"}
                     className={`rounded-full border px-3 py-1.5 uppercase transition-all ${
                       sort === k
                         ? "border-indigo-300/50 bg-indigo-400/10 text-white"
@@ -249,6 +252,7 @@ export default function App() {
                   key={lang}
                   data-hover
                   onClick={() => setActiveLang(lang)}
+                  aria-pressed={activeLang === lang}
                   className={`rounded-full border px-4 py-1.5 font-mono text-xs tracking-wide transition-all ${
                     activeLang === lang
                       ? "border-indigo-300/50 bg-indigo-400/10 text-white"
@@ -284,7 +288,8 @@ export default function App() {
         {error && (
           <div className="glass-strong mx-auto max-w-lg rounded-2xl p-10 text-center">
             <div className="font-mono text-4xl text-white/20">⚠</div>
-            <p className="mt-4 font-mono text-sm text-white/60">{error}</p>
+            <p role="alert" className="mt-4 font-mono text-sm text-white/60">{error}</p>
+            <button onClick={retry} className="mt-6 rounded-full border border-white/40 px-6 py-3 text-white">Reintentar</button>
             <a
               href={`https://github.com/${USERNAME}`}
               target="_blank"
@@ -339,7 +344,7 @@ export default function App() {
           </a>
         </div>
         <div className="mx-auto mt-10 max-w-6xl border-t border-white/[0.04] pt-6 text-center font-mono text-[10px] tracking-[0.25em] text-white/20">
-          © 2025 NOIACORE LAB — TODOS LOS SISTEMAS OPERATIVOS
+          © {new Date().getFullYear()} NOIACORE LAB · CATÁLOGO PÚBLICO
         </div>
       </footer>
 
